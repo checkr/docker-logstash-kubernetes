@@ -16,13 +16,15 @@ export HOME=/var/lib/logstash
 
 : ${OUTPUT_ELASTICSEARCH:=true}
 : ${ELASTICSEARCH_HOST:=127.0.0.1:9200}
+: ${ELASTICSEARCH_SSL:=true}
 : ${ELASTICSEARCH_INDEX_SUFFIX:=""}
+: ${ELASTICSEARCH_USER:=""}
+: ${ELASTICSEARCH_PASSWORD:=""}
 
 
 if [[ ${INPUT_JOURNALD} != 'true' ]]; then
   rm -f /logstash/conf.d/10_input_journald.conf
 fi
-
 
 if [[ ${OUTPUT_ELASTICSEARCH} != 'true' ]]; then
   rm -f /logstash/conf.d/20_output_journald_elasticsearch.conf
@@ -34,8 +36,16 @@ else
   sed -e "s/%ELASTICSEARCH_INDEX_SUFFIX%/${ELASTICSEARCH_INDEX_SUFFIX}/" \
       -i /logstash/conf.d/20_output_kubernetes_elasticsearch.conf \
       -i /logstash/conf.d/20_output_journald_elasticsearch.conf
+  sed -e "s/%ELASTICSEARCH_SSL%/${ELASTICSEARCH_SSL}/" \
+      -i /logstash/conf.d/20_output_kubernetes_elasticsearch.conf \
+      -i /logstash/conf.d/20_output_journald_elasticsearch.conf
+  sed -e "s/%ELASTICSEARCH_USER%/${ELASTICSEARCH_USER}/" \
+      -i /logstash/conf.d/20_output_kubernetes_elasticsearch.conf \
+      -i /logstash/conf.d/20_output_journald_elasticsearch.conf
+  sed -e "s/%ELASTICSEARCH_PASSWORD%/${ELASTICSEARCH_PASSWORD}/" \
+      -i /logstash/conf.d/20_output_kubernetes_elasticsearch.conf \
+      -i /logstash/conf.d/20_output_journald_elasticsearch.conf
 fi
-
 
 if [[ ${OUTPUT_CLOUDWATCH} != 'true' ]]; then
   rm -f /logstash/conf.d/20_output_kubernetes_cloudwatch.conf
@@ -48,7 +58,6 @@ else
       -i /logstash/conf.d/20_output_journald_cloudwatch.conf
 fi
 
-
 ulimit -n ${LS_OPEN_FILES} > /dev/null
 
-exec /logstash/bin/logstash -f /logstash/conf.d ${LOGSTASH_ARGS}
+exec logstash -f /logstash/conf.d ${LOGSTASH_ARGS}
