@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 export HOME=/var/lib/logstash
 
