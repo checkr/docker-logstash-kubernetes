@@ -1,7 +1,7 @@
-FROM logstash
+FROM logstash:2.4
 
 RUN logstash-plugin install logstash-output-elasticsearch && \
-  logstash-plugin install logstash-filter-kubernetes && \
+  logstash-plugin install logstash-filter-k8s && \
   logstash-plugin install logstash-input-journald && \
   logstash-plugin install logstash-output-cloudwatch
 
